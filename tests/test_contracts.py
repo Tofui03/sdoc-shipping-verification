@@ -692,8 +692,8 @@ def test_ct_data_008_export_blocked_safety_schema():
 
 
 def test_ct_data_009_examples_json_instantiation():
-    """Verify all 15 synthetic models in specs/03_DATA_CONTRACTS_EXAMPLES.json validate cleanly."""
-    examples_path = Path("specs/03_DATA_CONTRACTS_EXAMPLES.json")
+    """Verify all 15 synthetic models in the contract examples fixture validate cleanly."""
+    examples_path = Path(__file__).resolve().parent / "fixtures" / "data_contract_examples.json"
     assert examples_path.exists(), "Examples JSON file must exist"
 
     data = json.loads(examples_path.read_text(encoding="utf-8"))

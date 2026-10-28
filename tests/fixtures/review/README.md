@@ -13,10 +13,7 @@ This directory contains deterministic offline fixtures supporting tests for:
 - Optimistic concurrency control (`expected_revision` and HTTP 409 conflict scenarios)
 - Intentionally invalid payloads enforcing schema and security boundaries
 
-Authoritative specifications:
-- [`specs/03_DATA_CONTRACTS.md`](../../../specs/03_DATA_CONTRACTS.md) §§3, 4, 5, 7, 8
-- [`specs/04_UI_UX_SPEC.md`](../../../specs/04_UI_UX_SPEC.md) §5.4
-- [`specs/05_TEST_PLAN.md`](../../../specs/05_TEST_PLAN.md) §§12, 13
+These payloads follow the review models in `src/models` (`AuditRecord`, `ReviewUpdate`, evidence, and revision locking).
 
 ---
 

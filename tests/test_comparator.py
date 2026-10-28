@@ -637,7 +637,6 @@ def test_gross_weight_decimal_only_guards():
 
 def test_rule_version_authority_and_validation():
     """Verify rule_version follows authoritative norm-v1.0 baseline and validates non-emptiness."""
-    # Authoritative default matches 03_DATA_CONTRACTS_EXAMPLES.json
     assert DEFAULT_RULE_VERSION == "norm-v1.0"
 
     fc_default = compare_canonical_field("container_count", 2, 2)

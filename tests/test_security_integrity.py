@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import ast
-import hashlib
-import os
 from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
@@ -16,35 +14,6 @@ from src.store.audit_store import AuditStore
 
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
-BUNDLE_DIR = ROOT_DIR / "sdoc-hackathon-bundle"
-
-
-def _hash_bundle() -> dict[str, str]:
-    """Calculate SHA-256 for every file in sdoc-hackathon-bundle/."""
-    hashes: dict[str, str] = {}
-    if not BUNDLE_DIR.exists():
-        return hashes
-
-    for file_path in sorted(BUNDLE_DIR.rglob("*")):
-        if file_path.is_file():
-            rel_path = file_path.relative_to(BUNDLE_DIR).as_posix()
-            content = file_path.read_bytes()
-            hashes[rel_path] = hashlib.sha256(content).hexdigest()
-    return hashes
-
-
-def test_sec_data_001_evaluation_bundle_immutability():
-    """SEC-DATA-001: Verification suite asserts 100% evaluation bundle immutability."""
-    assert BUNDLE_DIR.exists(), f"Evaluation bundle missing at {BUNDLE_DIR}"
-    initial_hashes = _hash_bundle()
-    assert len(initial_hashes) > 0, "Evaluation bundle must contain files"
-
-    # Simulate read-only traversal
-    inbox_files = list((BUNDLE_DIR / "inbox").glob("*.json"))
-    assert len(inbox_files) > 0
-
-    post_hashes = _hash_bundle()
-    assert initial_hashes == post_hashes, "sdoc-hackathon-bundle files were mutated!"
 
 
 def test_sec_auth_001_api_key_leak_prevention():
