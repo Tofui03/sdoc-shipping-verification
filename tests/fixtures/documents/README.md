@@ -1,6 +1,6 @@
 # Synthetic Multi-Format Document Fixture Suite (`tests/fixtures/documents/`)
 
-This directory contains deterministic, 100% fictional multi-format document fixtures designed for testing document parsers, field extraction, deterministic normalization, OCR/Vision recovery, and discrepancy comparison without dependency on the evaluation dataset (`sdoc-hackathon-bundle/attachments/`).
+This directory contains fictional multi-format document fixtures for parser, extraction, normalization, OCR recovery, and comparison tests.
 
 ---
 
@@ -24,7 +24,7 @@ Total fixtures: 30 (28 Baseline Acceptance, 2 Exploratory).
 
 ## 2. Seven Mandatory Comparison Fields
 
-All fixtures and verification pairs focus strictly on the seven mandatory comparison fields defined in [`specs/00_PRODUCT_SPEC.md`](../../../specs/00_PRODUCT_SPEC.md) §3.2:
+All fixtures and verification pairs use these seven comparison fields:
 1. `shipper`
 2. `consignee`
 3. `notify_party`

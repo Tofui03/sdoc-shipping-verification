@@ -7,13 +7,10 @@ Creates offline test fixtures in tests/fixtures/review/:
 - updates/     : 18 valid ReviewUpdate request payloads (classification, roles, 7 fields, confirm, evidence)
 - concurrency/ : 3 optimistic revision scenarios (match, stale 409, race condition)
 - invalid/     : 17 intentionally invalid payloads (direct mismatch mutations, wrong enums, bad bboxes, etc.)
-- manifest.json: Authoritative catalogue and single source of truth
-- README.md    : Governance & fixture reference documentation
+- manifest.json: Catalogue of the generated fixtures
+- README.md    : Fixture reference
 
-Authoritative Contracts:
-- specs/03_DATA_CONTRACTS.md §§3, 4, 5, 7, 8
-- specs/04_UI_UX_SPEC.md §5.4
-- specs/05_TEST_PLAN.md §§12, 13
+Payloads follow the review models in src.models.
 """
 
 import json

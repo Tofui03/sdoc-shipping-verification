@@ -42,7 +42,7 @@ def load_inbox_emails(bundle_path: Path) -> List[Dict[str, Any]]:
 
 
 def run_pipeline(
-    bundle_dir: str = "sdoc-hackathon-bundle",
+    bundle_dir: str,
     submission_output: str = "submission.json",
     audit_output: str = "audit_report.json",
     limit: int = 0,
@@ -119,7 +119,7 @@ def run_pipeline(
 
 def main():
     parser = argparse.ArgumentParser(description="Run Shipping Document Verification Pipeline")
-    parser.add_argument("--bundle", default="sdoc-hackathon-bundle", help="Path to bundle folder")
+    parser.add_argument("--bundle", required=True, help="Directory containing inbox/email_*.json")
     parser.add_argument("--output", default="submission.json", help="Path to submission.json")
     parser.add_argument("--audit", default="audit_report.json", help="Path to audit_report.json")
     parser.add_argument("--limit", type=int, default=0, help="Limit to first N emails")

@@ -1,12 +1,12 @@
 # Synthetic Email Fixtures (`tests/fixtures/emails/`)
 
-This directory contains deterministic, 100% fictional synthetic email fixtures designed for testing Stage 1 email intent classification, attachment metadata handling, and early HITL routing without reliance on the private evaluation dataset (`sdoc-hackathon-bundle/inbox/`).
+This directory contains synthetic email fixtures for Stage 1 intent classification, attachment metadata, and early human-review routing.
 
 ---
 
 ## 1. Schema & Structure
 
-Each `.json` file contains a single, isolated synthetic email payload conforming to the baselined `EmailRecord` contract ([`specs/03_DATA_CONTRACTS.md`](../../../specs/03_DATA_CONTRACTS.md) §3):
+Each `.json` file contains one email payload in the `EmailRecord` shape:
 
 ```json
 {
@@ -58,8 +58,7 @@ Each `.json` file contains a single, isolated synthetic email payload conforming
 ## 3. Data Integrity & Privacy Protection
 
 - All sender addresses use the reserved `.test` pseudo-TLD (RFC 2606 / RFC 6761).
-- All entity names (`Synthetic Maritime Logistics`, `Oceanic Apex`, `Vanguard Traders`, etc.) are fictional.
-- Zero data was scraped, copied, or derived from `sdoc-hackathon-bundle/inbox/`.
+- Entity names in these fixtures are fictional.
 
 ---
 

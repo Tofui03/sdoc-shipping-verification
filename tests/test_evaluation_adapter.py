@@ -17,7 +17,7 @@ from src.store.audit_store import AuditStore
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EXAMPLES = json.loads((ROOT / 'specs/03_DATA_CONTRACTS_EXAMPLES.json').read_text(encoding='utf-8'))
+EXAMPLES = json.loads((ROOT / 'tests/fixtures/data_contract_examples.json').read_text(encoding='utf-8'))
 REVIEW_CASES = ROOT / 'tests/fixtures/review/cases'
 OFFICIAL_KEYS = {'category', 'status', 'review_reason', 'defect_fields', 'has_defect'}
 
@@ -83,9 +83,7 @@ def test_eval_map_002_null_category_blocks(example):
 @pytest.mark.parametrize('example', ['complete_match'], ids=['EVAL-MAP-003'])
 def test_eval_map_003_clean_match_exact_official_shape(example):
     result = EvaluationAdapter().to_submission_record(synthetic_record(example)).model_dump()
-    # The sample supplies shape only, never expected classifications or outcomes.
-    sample = json.loads((ROOT / 'sdoc-hackathon-bundle/sample_submission.json').read_text(encoding='utf-8'))
-    assert set(result) == OFFICIAL_KEYS == set(next(iter(sample.values())))
+    assert set(result) == OFFICIAL_KEYS
     assert result == dict(category='BL_COMPARISON', status='OK', review_reason=None, defect_fields=[], has_defect=False)
 
 

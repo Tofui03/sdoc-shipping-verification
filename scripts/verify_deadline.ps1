@@ -24,14 +24,6 @@ Write-Host '== OpenAPI / TypeScript contract synchronization ==' -ForegroundColo
 Set-Location $RepoRoot
 python scripts/verify_contracts.py
 
-Write-Host '== Evaluation bundle immutability ==' -ForegroundColor Cyan
-$bundleDiff = git diff --name-only origin/main -- sdoc-hackathon-bundle/
-if ($bundleDiff) {
-    Write-Host 'FAILED: sdoc-hackathon-bundle has modifications:' -ForegroundColor Red
-    Write-Host $bundleDiff
-    exit 1
-}
-
 Write-Host ''
 Write-Host 'ALL DEADLINE VERIFICATION CHECKS PASSED.' -ForegroundColor Green
 Write-Host 'The production React 18 frontend build is in docs/ ready for FastAPI and GitHub Pages.'
