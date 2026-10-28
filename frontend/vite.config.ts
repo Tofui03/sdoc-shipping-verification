@@ -4,8 +4,16 @@ import react from '@vitejs/plugin-react';
 
 declare const process: { env: Record<string, string | undefined> };
 
+// FastAPI/Render serves this build from /. Pages sets VITE_BASE_PATH to the repo subpath.
+function frontendBase(): string {
+  const raw = (process.env.VITE_BASE_PATH || '/').trim() || '/';
+  if (raw === '.' || raw === './') return './';
+  const withLeading = raw.charAt(0) === '/' ? raw : `/${raw}`;
+  return withLeading.charAt(withLeading.length - 1) === '/' ? withLeading : `${withLeading}/`;
+}
+
 export default defineConfig({
-  base: './',
+  base: frontendBase(),
   plugins: [react()],
   build: {
     outDir: '../docs',

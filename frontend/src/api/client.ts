@@ -83,7 +83,7 @@ export async function submitReview(emailId: string, update: ReviewUpdate): Promi
     if (found) {
       found.state = 'COMPLETE';
       found.revision = (found.revision || 1) + 1;
-      found.result_summary = update.notes || 'Human review completed and approved.';
+      found.result_summary = update.rationale || 'Human review completed and approved.';
       return found;
     }
     throw error;

@@ -43,6 +43,8 @@ jobs:
           cd frontend && npm ci
 
       - name: Build frontend and generate demo data
+        env:
+          VITE_BASE_PATH: /sdoc-shipping-verification/
         run: |
           cd frontend && npm run build
           cd ..

@@ -4,10 +4,9 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
 
-const basename =
-  typeof window !== 'undefined' && window.location.pathname.startsWith('/hackaton--the-farmer')
-    ? '/hackaton--the-farmer'
-    : undefined;
+// Follows the Vite build base. `/` (Render) has no basename; a subpath build does.
+const pagesBase = import.meta.env.BASE_URL.replace(/\/$/, '');
+const basename = pagesBase && pagesBase !== '.' ? pagesBase : undefined;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

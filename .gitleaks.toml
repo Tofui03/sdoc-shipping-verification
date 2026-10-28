@@ -1,0 +1,174 @@
+# gitleaks config for Tofui03/BJ-POS
+# Default gitleaks rules + Malaysian business-PII rules (LHDN TIN, bank accounts,
+# SSM registration numbers, hardcoded STORE_* / VITE_STORE_* shop values).
+#
+# Contains NO real values. Allowlisted values below are the public demo
+# placeholders used in the repo (hardware-catalog.ts, tests, .env.example).
+# Real shop data belongs in apps/pos/.env.local (git-ignored).
+#
+# A new *fake* test fixture that trips a rule: either use one of the
+# allowlisted values, add it to the fake-value list below, or put
+# `// gitleaks:allow` at the end of that line.
+
+title = "BJ-POS gitleaks config"
+
+[extend]
+useDefault = true
+
+# ---------------------------------------------------------------------------
+# Global allowlist
+# ---------------------------------------------------------------------------
+[[allowlists]]
+description = "Dependencies, lockfiles, build output, this config"
+paths = [
+  '''(?:^|/)node_modules/''',
+  '''(?:^|/)pnpm-lock\.yaml$''',
+  '''(?:^|/)package-lock\.json$''',
+  '''(?:^|/)(?:dist|dist-electron|dist_electron|release|out|coverage)/''',
+  '''(?:^|/)\.gitleaks\.toml$''',
+]
+
+[[allowlists]]
+description = "Known fake demo / test-fixture values (matched against the secret)"
+regexTarget = "secret"
+regexes = [
+  # LHDN TIN placeholders + fake customer TINs used in tests
+  '''^C0000000000$''',
+  '''^C1234567890$''',
+  '''^C9876543210$''',
+  '''^C9999999999$''',
+  '''^C2398472901$''',
+  '''^C9988776655$''',
+  '''^C2837492019$''',
+  '''^C2938472901$''',
+  '''^C1010101010$''',
+  '''^C2020202020$''',
+  '''^C9988112233$''',
+  '''^IG1234567890$''',
+  # bank account placeholders
+  '''^500000000000$''',
+  '''^3000000000$''',
+  '''^5101-9922-3344$''',
+  # SSM registration placeholders
+  '''^\(?\s*100234\s*-\s*[Xx]\s*\)?$''',
+  '''^\(?\s*123456\s*-\s*[Xx]\s*\)?$''',
+  '''^\(?\s*654321\s*-\s*[Kk]\s*\)?$''',
+  '''^200001012345$''',
+  '''^201901000005$''',
+  # all-same-digit / all-zero dummies (e.g. C0000000000, 0000000000)
+  '''^[A-Z]{0,2}[0-9]0{8,}$''',
+]
+
+[[allowlists]]
+description = "Default generic-api-key: BJ-POS item keys like key: \"hw_cement_50kg\" are snake_case ids, not secrets"
+targetRules = ["generic-api-key"]
+regexTarget = "secret"
+regexes = ['''^[a-z][a-z0-9]*(?:_[a-z0-9]+){1,6}$''']
+
+[[allowlists]]
+description = ".env.example holds empty placeholders only"
+paths = ['''(?:^|/)\.env\.example$''']
+regexTarget = "secret"
+regexes = ['''^\s*$''', '''^(?:your|change|replace|example|xxx|<).*$''']
+
+# ---------------------------------------------------------------------------
+# 1. LHDN Tax Identification Number (e-Invoice TIN)
+#    C = company, plus other non-individual prefixes and IG/SG/OG individuals.
+# ---------------------------------------------------------------------------
+[[rules]]
+id = "my-lhdn-tin"
+description = "Malaysian LHDN TIN hardcoded (e.g. C + 10-11 digits)"
+regex = '''\b((?:C|CS|D|E|F|FA|PT|TA|TC|TN|TR|TP|TJ|LE|J|IG|SG|OG)[0-9]{10,11})\b'''
+secretGroup = 1
+tags = ["pii", "malaysia", "tin"]
+
+# ---------------------------------------------------------------------------
+# 2a. Bank account number right after a Malaysian bank name
+# ---------------------------------------------------------------------------
+[[rules]]
+id = "my-bank-account-named"
+description = "Bank account number following a Malaysian bank name"
+regex = '''(?i)\b(?:maybank|mbb|public\s?bank|pbb|cimb|rhb|hong\s?leong|hlb|hlbb|ambank|bank\s?islam|bsn|bank\s?rakyat|affin|alliance\s?bank|ocbc|uob|hsbc|agrobank)\b[^0-9\r\n]{0,25}?([0-9](?:[ -]?[0-9]){9,15})\b'''
+secretGroup = 1
+keywords = ["maybank", "mbb", "public", "pbb", "cimb", "rhb", "hong", "hlb", "ambank", "islam", "bsn", "rakyat", "affin", "alliance", "ocbc", "uob", "hsbc", "agrobank"]
+tags = ["pii", "malaysia", "bank"]
+
+# ---------------------------------------------------------------------------
+# 2b. 10-16 digit quoted number near "bank" / "acc" / "a/c"
+# ---------------------------------------------------------------------------
+[[rules]]
+id = "my-bank-account-context"
+description = "10-16 digit account number in a string near bank/acc/a/c"
+# (a) key: "value" form, e.g. bankInfo: "... 1234567890"
+# (b) inside one string, e.g. "A/C No 1234567890"
+regex = '''(?i)(?:\b(?:bank|acc|acct|account)\w{0,20}["']?\s*[:=]\s*["'`][^"'`\r\n]{0,40}?|["'`][^"'`\r\n]{0,30}?\b(?:bank|acc|acct|account|a/c)\b[^"'`\r\n0-9]{0,20})\b([0-9](?:[ -]?[0-9]){9,15})\b[^"'`\r\n]{0,40}["'`]'''
+secretGroup = 1
+keywords = ["bank", "acc", "a/c"]
+tags = ["pii", "malaysia", "bank"]
+
+# ---------------------------------------------------------------------------
+# 3a. SSM registration number, old format 123456-X
+# ---------------------------------------------------------------------------
+[[rules]]
+id = "my-ssm-regno-old"
+description = "Malaysian SSM company/business registration number (old 123456-X)"
+regex = '''\b([0-9]{5,7}\s*-\s*[A-Za-z])\b'''
+secretGroup = 1
+tags = ["pii", "malaysia", "ssm"]
+
+# ---------------------------------------------------------------------------
+# 3b. SSM registration number, new 12-digit format YYYY + entity(01-06) + 6 digits
+#     Needs registration context, or the "(old-no)" right after it, to avoid
+#     matching random 12-digit numbers / timestamps.
+# ---------------------------------------------------------------------------
+[[rules]]
+id = "my-ssm-regno-new"
+description = "Malaysian SSM 12-digit registration number (e.g. 2xxx01xxxxxx)"
+regex = '''(?i)(?:reg|ssm|roc|rob|brn|company\s?no|co\.?\s?no|syarikat|pendaftaran)[^\r\n]{0,40}?\b((?:19|20)[0-9]{2}0[1-6][0-9]{6})\b'''
+secretGroup = 1
+keywords = ["reg", "ssm", "roc", "rob", "brn", "company", "co.", "syarikat", "pendaftaran"]
+tags = ["pii", "malaysia", "ssm"]
+
+[[rules]]
+id = "my-ssm-regno-new-with-old"
+description = "12-digit SSM number followed by (old-format no.)"
+regex = '''\b((?:19|20)[0-9]{2}0[1-6][0-9]{6})\s*\(\s*[0-9]{5,7}\s*-\s*[A-Za-z]\s*\)'''
+secretGroup = 1
+tags = ["pii", "malaysia", "ssm"]
+
+# ---------------------------------------------------------------------------
+# 4a. STORE_* / VITE_STORE_* constant assigned a literal string in code
+#     (fine: storeValue("VITE_STORE_X", "<demo placeholder>") / import.meta.env)
+# ---------------------------------------------------------------------------
+[[rules]]
+id = "bjpos-store-constant-literal"
+description = "STORE_* constant hardcoded with a literal value"
+regex = '''\b(?:VITE_)?STORE_[A-Z0-9_]+\b["']?\s*[:=]\s*["'`]([^"'`\r\n]{2,})["'`]'''
+secretGroup = 1
+keywords = ["store_"]
+tags = ["pii", "bjpos"]
+[[rules.allowlists]]
+description = "Demo placeholders only (every token is a known fake value)"
+regexTarget = "secret"
+regexes = [
+  '''^(?:[\s(),:/|.@-]|100234-X|087-300000|012-3456789|sales@borneojasa\.example\.com|C0000000000|500000000000|3000000000|200001012345|Maybank|Public Bank|Lot 88, Jalan Industri(?:, 89000 Keningau, Sabah)?|Borneo Jasa Sdn\. Bhd\.|立強有限公司|47520)+$''',
+  '''(?i)^(?:your|change|replace|example|placeholder|todo|xxx|<).*$''',
+]
+
+# ---------------------------------------------------------------------------
+# 4b. VITE_STORE_* / STORE_* set in an env-style file (KEY=value)
+# ---------------------------------------------------------------------------
+[[rules]]
+id = "bjpos-store-env-value"
+description = "VITE_STORE_* / STORE_* env var set to a value in a committed file"
+regex = '''(?m)^\s*(?:export\s+)?(?:VITE_)?STORE_[A-Z0-9_]+\s*=\s*["']?([^\s"'#][^"'\r\n#]*)'''
+secretGroup = 1
+keywords = ["store_"]
+tags = ["pii", "bjpos"]
+[[rules.allowlists]]
+description = "Placeholders"
+regexTarget = "secret"
+regexes = [
+  '''^(?:[\s(),:/|.@-]|100234-X|087-300000|012-3456789|sales@borneojasa\.example\.com|C0000000000|500000000000|3000000000|200001012345|Maybank|Public Bank|Lot 88, Jalan Industri(?:, 89000 Keningau, Sabah)?)+$''',
+  '''(?i)^(?:your|change|replace|example|placeholder|todo|xxx|<|\$\{).*$''',
+]
