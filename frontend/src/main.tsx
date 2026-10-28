@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
 
-// Vite base is /sdoc-shipping-verification/ on GitHub Pages. Strip the trailing slash for the router.
+// Follows the Vite build base. `/` (Render) has no basename; a subpath build does.
 const pagesBase = import.meta.env.BASE_URL.replace(/\/$/, '');
 const basename = pagesBase && pagesBase !== '.' ? pagesBase : undefined;
 
