@@ -8,8 +8,8 @@ declare const process: { env: Record<string, string | undefined> };
 function frontendBase(): string {
   const raw = (process.env.VITE_BASE_PATH || '/').trim() || '/';
   if (raw === '.' || raw === './') return './';
-  const withLeading = raw.startsWith('/') ? raw : `/${raw}`;
-  return withLeading.endsWith('/') ? withLeading : `${withLeading}/`;
+  const withLeading = raw.charAt(0) === '/' ? raw : `/${raw}`;
+  return withLeading.charAt(withLeading.length - 1) === '/' ? withLeading : `${withLeading}/`;
 }
 
 export default defineConfig({
